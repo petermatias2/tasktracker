@@ -75,6 +75,6 @@ jobs:
           docker push $IMAGE:git-$SHA
     - name: Run Jest tests
       run: |
-        docker build -t tasktracker-test -f Dockerfile .
-        docker run --rm tasktracker-test npm test
+        docker build --target test -t tasktracker-test .
+        docker run --rm tasktracker-test
 
