@@ -73,3 +73,6 @@ jobs:
           docker tag tasktracker:ci $IMAGE:git-$SHA
           docker push $IMAGE:latest
           docker push $IMAGE:git-$SHA
+    - name: Run Jest tests
+      run: |
+        docker run --rm -v ${{ github.workspace }}:/app -w /app node:20 npm test
