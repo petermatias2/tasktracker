@@ -15,3 +15,5 @@ docker compose up -d --build
 - Env-configured ports, volumes, init.sql
 - (Optional) k8s manifests in /k8s
 
+
+CI run: 2025-09-27 22:39:43Z
