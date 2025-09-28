@@ -2,13 +2,14 @@
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: \
-      POSTGRES_PASSWORD: \
-      POSTGRES_DB: \
+      POSTGRES_USER: ''
+      POSTGRES_PASSWORD: ''
+      POSTGRES_DB: ''
     volumes:
       - db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U \"]
+      # single quotes so  is taken literally by YAML
+      test: ['CMD-SHELL', 'pg_isready -U ']
       interval: 5s
       retries: 10
 
@@ -16,13 +17,13 @@
     build: .
     environment:
       PGHOST: db
-      PGUSER: \
-      PGPASSWORD: \
-      PGDATABASE: \
+      PGUSER: ''
+      PGPASSWORD: ''
+      PGDATABASE: ''
       PGPORT: 5432
-      PORT: \
+      PORT: ''
     ports:
-      - "\:\"
+      - ':'
     depends_on:
       db:
         condition: service_healthy
