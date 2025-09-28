@@ -1,0 +1,12 @@
+﻿apiVersion: v1
+kind: Service
+metadata:
+  name: tasktracker-api
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    app: tasktracker-api
+  ports:
+    - name: http
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.api.port }}

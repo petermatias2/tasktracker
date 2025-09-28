@@ -1,0 +1,44 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tasktracker-api
+spec:
+  replicas: {{ .Values.api.replicaCount }}
+  selector:
+    matchLabels:
+      app: tasktracker-api
+  template:
+    metadata:
+      labels:
+        app: tasktracker-api
+    spec:
+      containers:
+        - name: api
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.api.port }}
+          env:
+            - name: PORT
+              value: "{{ .Values.api.port }}"
+            - name: PGHOST
+              value: "{{ .Values.api.env.PGHOST }}"
+            - name: PGUSER
+              value: "{{ .Values.api.env.PGUSER }}"
+            - name: PGDATABASE
+              value: "{{ .Values.api.env.PGDATABASE }}"
+            - name: PGPORT
+              value: "{{ .Values.api.env.PGPORT }}"
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: tasktracker-postgres
+                  key: password
+          readinessProbe:
+            httpGet: { path: /healthz, port: {{ .Values.api.port }} }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: { path: /healthz, port: {{ .Values.api.port }} }
+            initialDelaySeconds: 10
+            periodSeconds: 10

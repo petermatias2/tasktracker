@@ -1,0 +1,34 @@
+﻿{{- if .Values.postgres.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tasktracker-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tasktracker-postgres
+  template:
+    metadata:
+      labels:
+        app: tasktracker-postgres
+    spec:
+      containers:
+        - name: postgres
+          image: "{{ .Values.postgres.image }}:{{ .Values.postgres.tag }}"
+          ports: [{ containerPort: 5432 }]
+          env:
+            - name: POSTGRES_USER
+              valueFrom: { secretKeyRef: { name: tasktracker-postgres, key: username } }
+            - name: POSTGRES_PASSWORD
+              valueFrom: { secretKeyRef: { name: tasktracker-postgres, key: password } }
+            - name: POSTGRES_DB
+              valueFrom: { secretKeyRef: { name: tasktracker-postgres, key: database } }
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: tasktracker-postgres-pvc
+{{- end }}

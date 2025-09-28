@@ -1,0 +1,7 @@
+﻿1) Install:
+   helm upgrade --install tasktracker ./helm/tasktracker
+2) Port-forward:
+   kubectl port-forward svc/tasktracker-api 8082:3000
+   kubectl port-forward svc/tasktracker-adminer 8090:8080
+3) Adminer login:
+   Server tasktracker-postgres | User appuser | Pass apppass | DB appdb
