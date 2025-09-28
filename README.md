@@ -1,4 +1,6 @@
-﻿![Build](https://github.com/petermatias2/tasktracker/actions/workflows/docker.yml/badge.svg)
+﻿![Build](https://github.com/petermatias2/tasktracker/actions/workflows/ci.yml/badge.svg)
+
+![Build](https://github.com/petermatias2/tasktracker/actions/workflows/docker.yml/badge.svg)
 
 # TaskTracker (Docker + Compose + Postgres)
 
@@ -23,3 +25,4 @@ CI run: 2025-09-27 22:44:27Z
 CI run: 2025-09-27 22:46:55Z
 
 CI run: 2025-09-28 08:51:14Z
+
