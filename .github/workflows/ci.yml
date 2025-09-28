@@ -28,8 +28,7 @@ jobs:
           API_PORT=3000
           HOST_API_PORT=8082
           EOF
-          echo "Created .env:"
-          cat .env
+          echo "Created .env:" && cat .env
 
       - name: Compose up (API + DB + Adminer)
         run: |
@@ -38,12 +37,19 @@ jobs:
             curl -fsS http://localhost:8082/healthz && exit 0
             sleep 2
           done
-          echo "API did not become healthy"; docker compose logs api; exit 1
+          echo "API did not become healthy"
+          docker compose ps
+          docker compose logs api
+          exit 1
 
       - name: Smoke test
         run: |
           curl -fsS http://localhost:8082/healthz | tee /tmp/health.txt
           grep -q '"ok":true' /tmp/health.txt
+
+      - name: Run Jest tests
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/app -w /app node:20 npm test
 
       - name: Build image
         run: docker build -t tasktracker:ci .
@@ -67,14 +73,9 @@ jobs:
       - name: Tag & Push
         if: ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && env.DOCKERHUB_USERNAME != '' && env.DOCKERHUB_TOKEN != '' }}
         run: |
-          IMAGE="petermatias2/tasktracker"
+          IMAGE="${{ env.DOCKERHUB_USERNAME }}/tasktracker"
           SHA="${GITHUB_SHA::7}"
           docker tag tasktracker:ci $IMAGE:latest
           docker tag tasktracker:ci $IMAGE:git-$SHA
           docker push $IMAGE:latest
           docker push $IMAGE:git-$SHA
-    - name: Run Jest tests
-      run: |
-        docker build --target test -t tasktracker-test .
-        docker run --rm tasktracker-test
-
