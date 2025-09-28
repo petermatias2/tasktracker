@@ -1,5 +1,5 @@
-const request = require("supertest");
-const app = require("../server");
+﻿const request = require("supertest");
+const app = require("../app");
 
 describe("Health endpoint", () => {
   it("should return ok:true", async () => {
