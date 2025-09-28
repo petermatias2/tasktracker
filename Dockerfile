@@ -1,17 +1,8 @@
-﻿# Base deps
-FROM node:20-alpine AS deps
+﻿FROM node:20-alpine
 WORKDIR /app
 COPY package*.json ./
-
-# ---- Test stage: installs dev deps and runs tests
-FROM deps AS test
-RUN npm ci
-COPY . .
-CMD ["npm","test"]
-
-# ---- Runtime image: prod-only deps, starts API
-FROM deps AS runtime
 RUN npm ci --omit=dev
 COPY . .
+ENV PORT=3000
 EXPOSE 3000
-CMD ["node","index.js"]
+CMD ["npm","start"]

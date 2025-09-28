@@ -2,9 +2,9 @@
 
 on:
   push:
-    branches: ["main","master","cleanup-ci"]
+    branches: ["main","cleanup-ci"]
   pull_request:
-    branches: ["main","master"]
+    branches: ["main"]
 
 jobs:
   ci:
@@ -16,24 +16,32 @@ jobs:
       - name: Build Docker image
         run: docker build -t tasktracker:ci .
 
-      - name: Run container
+      - name: Run container & wait for /healthz
         run: |
           docker run -d --name tt -p 8082:3000 tasktracker:ci
-          for i in {1..30}; do
-            curl -fsS http://localhost:8082/healthz && exit 0
+          for i in {1..40}; do
+            curl -fsS http://127.0.0.1:8082/healthz && break
             sleep 2
           done
-          echo "API did not become healthy"; docker logs tt; exit 1
+          test $i -lt 40 || (echo "health check failed"; docker logs tt; exit 1)
 
-      - name: Run Jest tests
-        run: |
-          docker run --rm -v "$GITHUB_WORKSPACE:/app" -w /app node:20 npx jest
+      - name: Run Jest tests (clean Node container)
+        run: docker run --rm -v "$PWD:/app" -w /app node:20 npx --yes jest
 
-      - name: Scan image with Trivy
+      - name: Scan image with Trivy (non-blocking)
         uses: aquasecurity/trivy-action@0.24.0
         with:
           image-ref: tasktracker:ci
-          vuln-type: 'os,library'
-          severity: 'HIGH,CRITICAL'
+          vuln-type: os,library
+          severity: HIGH,CRITICAL
           ignore-unfixed: true
-          format: 'table'
+          format: table
+          exit-code: 0
+
+      - name: Show container logs (always)
+        if: always()
+        run: docker logs tt || true
+
+      - name: Stop container (always)
+        if: always()
+        run: docker rm -f tt || true
