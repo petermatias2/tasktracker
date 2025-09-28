@@ -31,6 +31,12 @@ jobs:
           echo "Created .env:" && cat .env
 
       - name: Compose up (API + DB + Adminer)
+      env:
+        POSTGRES_USER: appuser
+        POSTGRES_PASSWORD: apppass
+        POSTGRES_DB: appdb
+        API_PORT: '3000'
+        HOST_API_PORT: '8082'
         run: |
           docker compose up -d --build
           for i in {1..30}; do
